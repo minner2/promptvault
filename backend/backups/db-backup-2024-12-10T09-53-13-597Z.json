@@ -1,0 +1,25 @@
+{
+  "prompts": [
+    {
+      "id": "1",
+      "model": "ChatGPTfefadaaaaaaaaaaaaaaafaegadfa",
+      "content": "你是一个专业的前端开发者...dfefe",
+      "usage": "用于前端开发相关问题咨询",
+      "categoryId": "1",
+      "source": "werereefefe",
+      "createTime": "2024-12-10T08:15:47.634Z",
+      "updateTime": "2024-12-10T09:30:09.320Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "1",
+      "name": "开发22",
+      "createTime": "2024-12-10T08:15:47.635Z",
+      "updateTime": "2024-12-10T09:21:17.622Z"
+    }
+  ],
+  "admin": {
+    "password": "admin123"
+  }
+}

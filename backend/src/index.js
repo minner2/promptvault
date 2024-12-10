@@ -4,9 +4,53 @@ const session = require('express-session');
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 const { v4: uuidv4 } = require('uuid');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const port = 3000;
+
+// 创建备份目录
+const backupDir = path.join(__dirname, '../backups');
+if (!fs.existsSync(backupDir)) {
+  fs.mkdirSync(backupDir, { recursive: true });
+}
+
+// 备份数据库函数
+const backupDatabase = () => {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const backupPath = path.join(backupDir, `db-backup-${timestamp}.json`);
+  
+  try {
+    // 读取当前数据库文件
+    const currentData = fs.readFileSync('db.json');
+    // 写入备份文件
+    fs.writeFileSync(backupPath, currentData);
+    console.log(`数据库备份成功: ${backupPath}`);
+    
+    // 清理旧备份（只保留最近5个备份）
+    const files = fs.readdirSync(backupDir)
+      .filter(file => file.startsWith('db-backup-'))
+      .sort()
+      .reverse();
+    
+    if (files.length > 5) {
+      files.slice(5).forEach(file => {
+        fs.unlinkSync(path.join(backupDir, file));
+        console.log(`删除旧备份: ${file}`);
+      });
+    }
+  } catch (error) {
+    console.error('数据库备份失败:', error);
+  }
+};
+
+// 设置定时备份（每15天执行一次）
+const BACKUP_INTERVAL = 15 * 24 * 60 * 60 * 1000; // 15天的毫秒数
+setInterval(backupDatabase, BACKUP_INTERVAL);
+
+// 启动时执行一次备份
+setTimeout(backupDatabase, 1000);
 
 // 使用 JSON 文件作为数据库
 const adapter = new FileSync('db.json');
