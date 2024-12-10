@@ -116,19 +116,19 @@
                     {{ prompt.model }}
                   </h3>
                 </el-tooltip>
-                <div class="flex items-center space-x-2">
+                <div class="flex items-center gap-2 ml-2 flex-shrink-0">
                   <button
-                    class="inline-flex items-center px-3 py-1.5 text-sm transition-all duration-300 rounded-lg"
+                    class="inline-flex items-center px-2.5 py-1.5 text-sm transition-all duration-300 rounded-lg whitespace-nowrap"
                     :class="isDark
                       ? 'bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-white'
                       : 'bg-gray-100/50 hover:bg-gray-100 text-gray-600 hover:text-gray-900'"
                     @click.stop="showUsage(prompt)"
                   >
                     <el-icon class="mr-1"><Document /></el-icon>
-                    用途说明
+                    用途
                   </button>
                   <button
-                    class="inline-flex items-center px-3 py-1.5 text-sm transition-all duration-300 rounded-lg"
+                    class="inline-flex items-center px-2.5 py-1.5 text-sm transition-all duration-300 rounded-lg whitespace-nowrap"
                     :class="isDark
                       ? 'bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-white'
                       : 'bg-gray-100/50 hover:bg-gray-100 text-gray-600 hover:text-gray-900'"
@@ -147,7 +147,7 @@
                 <p class="line-clamp-4">{{ prompt.content }}</p>
               </div>
               <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2">
+                <div class="flex items-center gap-2 flex-wrap">
                   <span 
                     class="px-3 py-1 rounded-full text-xs transition-colors duration-300"
                     :class="isDark
@@ -174,7 +174,7 @@
                   </span>
                 </div>
                 <button
-                  class="inline-flex items-center text-xs transition-all duration-300 hover:translate-x-1"
+                  class="inline-flex items-center text-xs transition-all duration-300 hover:translate-x-1 flex-shrink-0 ml-2"
                   :class="isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-500 hover:text-blue-600'"
                   @click="viewPrompt(prompt.id)"
                 >
@@ -194,17 +194,48 @@
       width="500px"
       :modal-class="isDark ? '!bg-gray-900/80 backdrop-blur' : '!bg-gray-50/80 backdrop-blur'"
       :close-on-click-modal="true"
+      :show-close="false"
+      :append-to-body="true"
       destroy-on-close
       class="usage-dialog"
     >
-      <template #title>
-        <div class="truncate max-w-[400px]">{{ selectedPrompt?.model }}</div>
+      <template #header>
+        <div class="flex items-center justify-between p-4">
+          <el-tooltip
+            :content="selectedPrompt?.model"
+            placement="top"
+            :show-after="500"
+          >
+            <h3 class="text-lg font-medium truncate max-w-[360px]" :class="isDark ? 'text-white' : 'text-gray-900'">
+              {{ selectedPrompt?.model }}
+            </h3>
+          </el-tooltip>
+          <button
+            class="rounded-lg p-1 transition-colors duration-200 hover:bg-gray-500/10"
+            @click="usageDialogVisible = false"
+          >
+            <el-icon class="w-5 h-5" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+              <Close />
+            </el-icon>
+          </button>
+        </div>
       </template>
-      <div class="p-4 rounded-lg" :class="isDark ? 'bg-gray-800' : 'bg-white'">
-        <div class="whitespace-pre-wrap" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
-          {{ selectedPrompt?.usage }}
+      <div 
+        class="p-6 rounded-lg" 
+        :class="isDark ? 'bg-gray-800/50' : 'bg-gray-50'"
+      >
+        <div 
+          class="whitespace-pre-wrap" 
+          :class="isDark ? 'text-gray-300' : 'text-gray-600'"
+        >
+          {{ selectedPrompt?.usage || '暂无使用说明' }}
         </div>
       </div>
+      <template #footer>
+        <div class="flex justify-end p-4 border-t" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+          <el-button @click="usageDialogVisible = false">关闭</el-button>
+        </div>
+      </template>
     </el-dialog>
   </div>
 </template>
@@ -213,7 +244,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Sunny, Moon, Document, Share, ArrowRight, Link } from '@element-plus/icons-vue'
+import { Sunny, Moon, Document, Share, ArrowRight, Link, Close } from '@element-plus/icons-vue'
 import { useThemeStore } from '../stores/theme'
 import axios from 'axios'
 
@@ -327,38 +358,42 @@ onMounted(() => {
 </script>
 
 <style>
-/* 重写 Element Plus 弹窗动画 */
+/* 重写 Element Plus 弹窗样式 */
 .usage-dialog {
   @apply !bg-transparent !border-none;
 }
 
 .usage-dialog .el-dialog {
-  margin-top: 15vh !important;
-  transform: none !important;
-  transition: opacity 0.3s ease-in-out !important;
+  @apply !rounded-xl overflow-hidden !border !shadow-2xl transition-all duration-300;
+}
+
+.usage-dialog .el-dialog__header {
+  @apply !p-0 !m-0 !border-b-0;
+}
+
+.usage-dialog .el-dialog__headerbtn {
+  @apply !hidden;  /* 隐藏默认的关闭按钮 */
+}
+
+.usage-dialog .el-dialog__body {
+  @apply !p-0;
+}
+
+.usage-dialog .el-dialog__footer {
+  @apply !p-0 !mt-0;
+}
+
+.dark .usage-dialog .el-dialog {
+  @apply !bg-gray-800/95 !border-gray-700;
+}
+
+.usage-dialog .el-dialog {
+  @apply !bg-white/95 !border-gray-200;
 }
 
 .usage-dialog .el-overlay {
   @apply backdrop-blur-sm;
   transition: opacity 0.3s ease-in-out !important;
-}
-
-.el-dialog__header {
-  @apply !p-4 !mb-0 !border-b;
-  @apply dark:!border-gray-700;
-}
-
-.el-dialog__headerbtn {
-  @apply !top-4 !right-4;
-}
-
-.el-dialog__title {
-  @apply !text-lg !font-medium;
-  @apply dark:!text-white;
-}
-
-.el-dialog__body {
-  @apply !p-0;
 }
 
 /* 移除原有的动画类 */
