@@ -317,7 +317,7 @@ const searchQuery = ref('')
 // 获取分类数据
 const fetchCategories = async () => {
   try {
-    const res = await axios.get('http://localhost:3000/api/categories')
+    const res = await axios.get('/categories')
     categories.value = res.data
   } catch (error) {
     ElMessage.error('获取分类数据失败')
@@ -328,8 +328,8 @@ const fetchCategories = async () => {
 const fetchPrompts = async () => {
   try {
     loading.value = true
-    const res = await axios.get('http://localhost:3000/api/prompts')
-    allPrompts.value = res.data // 保存原始数据
+    const res = await axios.get('/prompts')
+    allPrompts.value = res.data
     prompts.value = res.data
   } catch (error) {
     ElMessage.error('获取数据失败')

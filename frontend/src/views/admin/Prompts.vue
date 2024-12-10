@@ -118,7 +118,7 @@ const form = ref({
 
 const rules = {
   model: [
-    { required: true, message: '请输入提示词名称', trigger: 'blur' },
+    { required: true, message: '请输���提示词名称', trigger: 'blur' },
     { max: 50, message: '名称长度不能超过50个字符', trigger: 'blur' }
   ],
   content: [{ required: true, message: '请输入prompt内容', trigger: 'blur' }],
@@ -131,8 +131,8 @@ const fetchData = async () => {
   try {
     loading.value = true
     const [promptsRes, categoriesRes] = await Promise.all([
-      axios.get('http://localhost:3000/api/prompts', { withCredentials: true }),
-      axios.get('http://localhost:3000/api/categories', { withCredentials: true })
+      axios.get('/prompts', { withCredentials: true }),
+      axios.get('/categories', { withCredentials: true })
     ])
     
     categories.value = categoriesRes.data
@@ -166,7 +166,7 @@ const handleDelete = async (row) => {
     await ElMessageBox.confirm('确定要删除这个prompt吗？', '提示', {
       type: 'warning'
     })
-    await axios.delete(`http://localhost:3000/api/prompts/${row.id}`, {
+    await axios.delete(`/prompts/${row.id}`, {
       withCredentials: true
     })
     ElMessage.success('删除成功')
@@ -211,12 +211,12 @@ const handleSubmit = async () => {
     submitting.value = true
     
     if (isEdit.value) {
-      await axios.put(`http://localhost:3000/api/prompts/${form.value.id}`, form.value, {
+      await axios.put(`/prompts/${form.value.id}`, form.value, {
         withCredentials: true
       })
       ElMessage.success('更新成功')
     } else {
-      await axios.post('http://localhost:3000/api/prompts', form.value, {
+      await axios.post('/prompts', form.value, {
         withCredentials: true
       })
       ElMessage.success('添加成功')

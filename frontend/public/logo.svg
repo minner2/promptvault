@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景圆形 -->
+    <circle cx="256" cy="256" r="248" fill="#1a1a1a" stroke="#00ff00" stroke-width="16"/>
+    
+    <!-- 命令提示符符号 > -->
+    <path d="M140 180L220 256L140 332" stroke="#00ff00" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- 闪烁的光标 -->
+    <rect x="240" y="300" width="160" height="24" fill="#00ff00">
+        <animate
+            attributeName="opacity"
+            values="1;0;1"
+            dur="1.5s"
+            repeatCount="indefinite"
+        />
+    </rect>
+    
+    <!-- 装饰性圆环 -->
+    <circle cx="256" cy="256" r="220" stroke="#00ff00" stroke-width="2" stroke-dasharray="4 4" opacity="0.3"/>
+</svg> 

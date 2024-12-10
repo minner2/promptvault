@@ -93,7 +93,7 @@ const handleLogout = async () => {
     await ElMessageBox.confirm('确定要退出登录吗？', '提示', {
       type: 'warning'
     })
-    await axios.post('http://localhost:3000/api/admin/logout', {}, {
+    await axios.post('/admin/logout', {}, {
       withCredentials: true
     })
     isAdmin.value = false
@@ -108,7 +108,7 @@ const handleLogout = async () => {
 
 const checkAdminStatus = async () => {
   try {
-    const res = await axios.get('http://localhost:3000/api/admin/check', {
+    const res = await axios.get('/admin/check', {
       withCredentials: true
     })
     isAdmin.value = res.data.isAdmin

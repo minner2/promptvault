@@ -125,7 +125,7 @@ const usageDialogVisible = ref(false)
 const fetchPrompt = async () => {
   try {
     loading.value = true
-    const res = await axios.get(`http://localhost:3000/api/prompts/${route.params.id}`)
+    const res = await axios.get(`/prompts/${route.params.id}`)
     prompt.value = res.data
   } catch (error) {
     ElMessage.error('获取数据失败')

@@ -6,6 +6,11 @@ import 'element-plus/dist/index.css'
 import router from './router'
 import App from './App.vue'
 import './assets/main.css'
+import axios from 'axios'
+
+// 配置 axios 默认值
+axios.defaults.baseURL = import.meta.env.VITE_API_URL
+axios.defaults.withCredentials = true
 
 const app = createApp(App)
 
