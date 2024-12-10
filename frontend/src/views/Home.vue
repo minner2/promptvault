@@ -104,9 +104,18 @@
           >
             <div class="p-6">
               <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-medium" :class="isDark ? 'text-white' : 'text-gray-900'">
-                  {{ prompt.model }}
-                </h3>
+                <el-tooltip
+                  :content="prompt.model"
+                  placement="top"
+                  :show-after="500"
+                >
+                  <h3 
+                    class="text-lg font-medium truncate max-w-[200px]" 
+                    :class="isDark ? 'text-white' : 'text-gray-900'"
+                  >
+                    {{ prompt.model }}
+                  </h3>
+                </el-tooltip>
                 <div class="flex items-center space-x-2">
                   <button
                     class="inline-flex items-center px-3 py-1.5 text-sm transition-all duration-300 rounded-lg"
@@ -149,12 +158,19 @@
                   </span>
                   <span 
                     v-if="prompt.source"
-                    class="px-3 py-1 rounded-full text-xs transition-colors duration-300"
+                    class="px-3 py-1 rounded-full text-xs transition-colors duration-300 flex items-center gap-1 max-w-[200px] group cursor-pointer"
                     :class="isDark
-                      ? 'bg-blue-500/10 text-blue-400'
-                      : 'bg-blue-50 text-blue-600'"
+                      ? 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20'
+                      : 'bg-blue-50 text-blue-600 hover:bg-blue-100'"
+                    @click.stop="handleSourceClick(prompt.source)"
                   >
-                    来源: {{ prompt.source }}
+                    <span class="whitespace-nowrap">来源：</span>
+                    <span class="truncate">
+                      {{ formatSource(prompt.source) }}
+                    </span>
+                    <el-icon class="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Link />
+                    </el-icon>
                   </span>
                 </div>
                 <button
@@ -175,13 +191,15 @@
     <!-- 用途说明弹窗 -->
     <el-dialog
       v-model="usageDialogVisible"
-      :title="selectedPrompt?.model"
       width="500px"
       :modal-class="isDark ? '!bg-gray-900/80 backdrop-blur' : '!bg-gray-50/80 backdrop-blur'"
       :close-on-click-modal="true"
       destroy-on-close
       class="usage-dialog"
     >
+      <template #title>
+        <div class="truncate max-w-[400px]">{{ selectedPrompt?.model }}</div>
+      </template>
       <div class="p-4 rounded-lg" :class="isDark ? 'bg-gray-800' : 'bg-white'">
         <div class="whitespace-pre-wrap" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
           {{ selectedPrompt?.usage }}
@@ -195,7 +213,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Sunny, Moon, Document, Share, ArrowRight } from '@element-plus/icons-vue'
+import { Sunny, Moon, Document, Share, ArrowRight, Link } from '@element-plus/icons-vue'
 import { useThemeStore } from '../stores/theme'
 import axios from 'axios'
 
@@ -277,6 +295,28 @@ const sharePrompt = async (promptId) => {
       type: 'error'
     })
     console.error('复制失败:', error)
+  }
+}
+
+// 格式化来源显示
+const formatSource = (source) => {
+  try {
+    if (source.startsWith('http://') || source.startsWith('https://')) {
+      const url = new URL(source)
+      return url.hostname.replace(/^www\./, '')
+    }
+    return source
+  } catch {
+    return source
+  }
+}
+
+// 处理来源点击
+const handleSourceClick = (source) => {
+  if (source.startsWith('http://') || source.startsWith('https://')) {
+    window.open(source, '_blank')
+  } else {
+    ElMessage.info('不是有效的链接')
   }
 }
 

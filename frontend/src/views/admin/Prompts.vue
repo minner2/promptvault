@@ -13,7 +13,7 @@
       :data="prompts"
       style="width: 100%"
     >
-      <el-table-column prop="model" label="模型" width="180" />
+      <el-table-column prop="model" label="名称" width="180" />
       <el-table-column prop="content" label="内容">
         <template #default="{ row }">
           <div class="truncate max-w-md">{{ row.content }}</div>
@@ -50,8 +50,13 @@
         :rules="rules"
         label-width="80px"
       >
-        <el-form-item label="模型" prop="model">
-          <el-input v-model="form.model" placeholder="请输入适用的模型" />
+        <el-form-item label="名称" prop="model">
+          <el-input 
+            v-model="form.model" 
+            placeholder="请输入提示词名称"
+            maxlength="50"
+            show-word-limit
+          />
         </el-form-item>
         <el-form-item label="内容" prop="content">
           <el-input
@@ -112,7 +117,10 @@ const form = ref({
 })
 
 const rules = {
-  model: [{ required: true, message: '请输入模型名称', trigger: 'blur' }],
+  model: [
+    { required: true, message: '请输入提示词名称', trigger: 'blur' },
+    { max: 50, message: '名称长度不能超过50个字符', trigger: 'blur' }
+  ],
   content: [{ required: true, message: '请输入prompt内容', trigger: 'blur' }],
   usage: [{ required: true, message: '请输入使用说明', trigger: 'blur' }],
   categoryId: [{ required: true, message: '请选择分类', trigger: 'change' }]
@@ -158,7 +166,7 @@ const handleDelete = async (row) => {
     await ElMessageBox.confirm('确定要删除这个prompt吗？', '提示', {
       type: 'warning'
     })
-    await axios.delete(`http://localhost:3000/api/admin/prompts/${row.id}`, {
+    await axios.delete(`http://localhost:3000/api/prompts/${row.id}`, {
       withCredentials: true
     })
     ElMessage.success('删除成功')
@@ -203,12 +211,12 @@ const handleSubmit = async () => {
     submitting.value = true
     
     if (isEdit.value) {
-      await axios.put(`http://localhost:3000/api/admin/prompts/${form.value.id}`, form.value, {
+      await axios.put(`http://localhost:3000/api/prompts/${form.value.id}`, form.value, {
         withCredentials: true
       })
       ElMessage.success('更新成功')
     } else {
-      await axios.post('http://localhost:3000/api/admin/prompts', form.value, {
+      await axios.post('http://localhost:3000/api/prompts', form.value, {
         withCredentials: true
       })
       ElMessage.success('添加成功')

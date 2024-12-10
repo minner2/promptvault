@@ -31,35 +31,8 @@ app.use(cors({
 
 app.use(express.json());
 
-// 初始化数据
-const defaultData = {
-  prompts: [
-    {
-      id: '1',
-      model: 'ChatGPT',
-      content: '你是一个专业的前端开发者...',
-      usage: '用于前端开发相关问题咨询',
-      categoryId: '1',
-      source: 'Github',
-      createTime: new Date().toISOString(),
-      updateTime: new Date().toISOString()
-    }
-  ],
-  categories: [
-    {
-      id: '1',
-      name: '开发',
-      createTime: new Date().toISOString(),
-      updateTime: new Date().toISOString()
-    }
-  ],
-  admin: {
-    password: 'admin123' // ��认管理员密码
-  }
-}
-
-// 初始化默认数据
-db.defaults(defaultData).write();
+// 初始化数据库结构
+db.defaults({ prompts: [], categories: [], admin: { password: 'admin123' } }).write();
 
 // 验证管理员中间件
 const checkAdmin = (req, res, next) => {
@@ -122,7 +95,7 @@ app.post('/api/prompts', checkAdmin, (req, res) => {
   try {
     const { model, content, usage, categoryId, source } = req.body;
     if (!model || !content) {
-      return res.status(400).json({ message: '模型名称和提示词内容不能为空' });
+      return res.status(400).json({ message: '提示词名称和内容不能为空' });
     }
 
     const prompt = {
@@ -149,7 +122,7 @@ app.put('/api/prompts/:id', checkAdmin, (req, res) => {
     const { id } = req.params;
     const { model, content, usage, categoryId, source } = req.body;
     if (!model || !content) {
-      return res.status(400).json({ message: '模型名称和提示词内容不能为空' });
+      return res.status(400).json({ message: '提示词名称和内容不能为空' });
     }
 
     const prompt = db.get('prompts').find({ id }).value();

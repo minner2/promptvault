@@ -27,7 +27,17 @@
     <div class="mt-8">
       <h3 class="text-lg font-medium text-gray-900 mb-4">最近添加的 Prompts</h3>
       <el-table :data="recentPrompts" style="width: 100%">
-        <el-table-column prop="model" label="模型" width="180" />
+        <el-table-column prop="model" label="名称" width="180">
+          <template #default="{ row }">
+            <el-tooltip
+              :content="row.model"
+              placement="top"
+              :show-after="500"
+            >
+              <div class="truncate">{{ row.model }}</div>
+            </el-tooltip>
+          </template>
+        </el-table-column>
         <el-table-column prop="content" label="内容">
           <template #default="{ row }">
             <div class="truncate max-w-md">{{ row.content }}</div>
