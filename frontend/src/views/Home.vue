@@ -9,7 +9,7 @@
         <div class="flex items-center justify-between h-16">
           <div class="flex items-center">
             <span class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-              Prompt Hub
+              Prompt Vault 
             </span>
           </div>
           <div class="flex items-center space-x-4">
@@ -37,14 +37,49 @@
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <!-- 标题 -->
+      <!-- 标题和搜索区域 -->
       <div class="text-center mb-16">
-        <h1 class="text-4xl font-bold mb-4" :class="isDark ? 'text-white' : 'text-gray-900'">
+        <h1 
+          class="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent"
+        >
           探索 AI 提示词
         </h1>
-        <p class="text-lg" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-          发现和分享高质量的 AI 提示词
+        <p class="text-xl mb-12" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+          发现和分享高质量的 AI 提示词，让创作更加高效
         </p>
+        <!-- 搜索栏 -->
+        <div class="max-w-3xl mx-auto relative group">
+          <div 
+            class="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-700 rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-300"
+            :class="isDark ? 'opacity-30 group-hover:opacity-40' : 'opacity-20 group-hover:opacity-30'"
+          ></div>
+          <div class="relative">
+            <input
+              v-model="searchQuery"
+              type="text"
+              class="w-full px-8 py-6 text-lg rounded-2xl transition-all duration-300 outline-none shadow-lg"
+              :class="isDark 
+                ? 'bg-gray-800/80 text-white placeholder-gray-500 border border-gray-700/50 focus:border-blue-500/50'
+                : 'bg-white/80 text-gray-900 placeholder-gray-400 border border-gray-200 focus:border-blue-500/30'"
+              placeholder="搜索提示词、内容或使用说明..."
+              @input="handleSearch"
+            />
+            <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+              <span 
+                class="text-sm px-2 py-1 rounded"
+                :class="isDark ? 'text-gray-400 bg-gray-700/50' : 'text-gray-500 bg-gray-100'"
+              >
+                {{ filteredPrompts.length }} 个结果
+              </span>
+              <el-icon 
+                class="w-6 h-6"
+                :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+              >
+                <Search />
+              </el-icon>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 分类列表 -->
@@ -244,9 +279,10 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Sunny, Moon, Document, Share, ArrowRight, Link, Close } from '@element-plus/icons-vue'
+import { Sunny, Moon, Document, Share, ArrowRight, Link, Close, Search } from '@element-plus/icons-vue'
 import { useThemeStore } from '../stores/theme'
 import axios from 'axios'
+import { debounce } from 'lodash-es'
 
 const router = useRouter()
 const themeStore = useThemeStore()
@@ -255,10 +291,12 @@ const toggleTheme = themeStore.toggleTheme
 
 const categories = ref([])
 const prompts = ref([])
+const allPrompts = ref([]) // 存储所有原始数据
 const loading = ref(false)
 const selectedCategory = ref(null)
 const usageDialogVisible = ref(false)
 const selectedPrompt = ref(null)
+const searchQuery = ref('')
 
 // 获取分类数据
 const fetchCategories = async () => {
@@ -275,6 +313,7 @@ const fetchPrompts = async () => {
   try {
     loading.value = true
     const res = await axios.get('http://localhost:3000/api/prompts')
+    allPrompts.value = res.data // 保存原始数据
     prompts.value = res.data
   } catch (error) {
     ElMessage.error('获取数据失败')
@@ -285,8 +324,24 @@ const fetchPrompts = async () => {
 
 // 过滤后的prompts
 const filteredPrompts = computed(() => {
-  if (!selectedCategory.value) return prompts.value
-  return prompts.value.filter(p => p.categoryId === selectedCategory.value)
+  let filtered = allPrompts.value
+
+  // 搜索过滤
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(p => 
+      p.model.toLowerCase().includes(query) || 
+      p.content.toLowerCase().includes(query) ||
+      p.usage?.toLowerCase().includes(query)
+    )
+  }
+
+  // 分类过滤
+  if (selectedCategory.value) {
+    filtered = filtered.filter(p => p.categoryId === selectedCategory.value)
+  }
+
+  return filtered
 })
 
 // 获取分类名称
@@ -295,9 +350,15 @@ const getCategoryName = (categoryId) => {
   return category ? category.name : '未分类'
 }
 
+// 处理搜索
+const handleSearch = debounce(() => {
+  prompts.value = filteredPrompts.value
+}, 300)
+
 // 选择分类
 const selectCategory = (categoryId) => {
   selectedCategory.value = categoryId
+  prompts.value = filteredPrompts.value
 }
 
 // 查看prompt详情
