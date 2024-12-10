@@ -9,7 +9,7 @@
         <div class="flex items-center justify-between h-16">
           <div class="flex items-center">
             <span class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-              Prompt Vault 
+              PROMPT VAULT
             </span>
           </div>
           <div class="flex items-center space-x-4">
@@ -42,7 +42,7 @@
         <h1 
           class="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent"
         >
-          探索 AI 提示词
+           探索 AI 提示词
         </h1>
         <p class="text-xl mb-12" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
           发现和分享高质量的 AI 提示词，让创作更加高效
@@ -272,14 +272,30 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- 回到顶部按钮 -->
+    <Transition name="fade">
+      <button
+        v-show="showBackToTop"
+        class="fixed right-6 bottom-6 p-3 rounded-xl shadow-lg transition-all duration-300 backdrop-blur-sm"
+        :class="isDark 
+          ? 'bg-gray-800/80 hover:bg-gray-700/80 text-gray-400 hover:text-gray-300' 
+          : 'bg-white/80 hover:bg-gray-50/80 text-gray-600 hover:text-gray-800'"
+        @click="scrollToTop"
+      >
+        <el-icon class="w-5 h-5">
+          <CaretTop />
+        </el-icon>
+      </button>
+    </Transition>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Sunny, Moon, Document, Share, ArrowRight, Link, Close, Search } from '@element-plus/icons-vue'
+import { Sunny, Moon, Document, Share, ArrowRight, Link, Close, Search, CaretTop } from '@element-plus/icons-vue'
 import { useThemeStore } from '../stores/theme'
 import axios from 'axios'
 import { debounce } from 'lodash-es'
@@ -412,9 +428,28 @@ const handleSourceClick = (source) => {
   }
 }
 
+// 回到顶部功能
+const showBackToTop = ref(false)
+
+const handleScroll = () => {
+  showBackToTop.value = window.scrollY > 300
+}
+
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
+}
+
 onMounted(() => {
   fetchCategories()
   fetchPrompts()
+  window.addEventListener('scroll', handleScroll)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
 })
 </script>
 
@@ -464,5 +499,16 @@ onMounted(() => {
 
 .el-dialog {
   animation: none !important;
+}
+
+/* 回到顶部按钮动画 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style> 
