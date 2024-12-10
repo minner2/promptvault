@@ -62,14 +62,23 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // 开发环境使用 http
-    maxAge: 24 * 60 * 60 * 1000 // 24小时
+    secure: process.env.NODE_ENV === 'production', // 生产环境使用 https
+    maxAge: 24 * 60 * 60 * 1000, // 24小时
+    sameSite: 'lax'
   }
 }));
 
 // 配置 CORS
+const allowedOrigins = ['http://localhost:5173', 'https://prompt.raymind-blog.top'];
 app.use(cors({
-  origin: 'http://localhost:5173', // 前端地址
+  origin: function(origin, callback) {
+    // 允许来自allowedOrigins的请求或者没有origin的请求（比如同源请求）
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, origin);
+    } else {
+      callback(new Error('不允许的来源'));
+    }
+  },
   credentials: true // 允许携带凭证
 }));
 
