@@ -12,6 +12,10 @@ PromptVault 是一个用于收集、管理和分享高质量 AI 提示词的平�
 - 💾 自动备份功能
 - 🔄 定期数据备份（每15天）
 
+## 界面预览
+![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-2.png)
 ## 技术栈
 
 ### 前端
