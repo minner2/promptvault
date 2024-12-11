@@ -102,8 +102,8 @@ const fetchData = async () => {
   try {
     loading.value = true
     const [categoriesRes, promptsRes] = await Promise.all([
-      axios.get('http://localhost:3000/api/categories', { withCredentials: true }),
-      axios.get('http://localhost:3000/api/prompts', { withCredentials: true })
+      axios.get('/categories', { withCredentials: true }),
+      axios.get('/prompts', { withCredentials: true })
     ])
     
     // 计算每个分类下的prompt数量
@@ -145,7 +145,7 @@ const handleDelete = async (row) => {
     await ElMessageBox.confirm('确定要删除这个分类吗？', '提示', {
       type: 'warning'
     })
-    await axios.delete(`http://localhost:3000/api/categories/${row.id}`, {
+    await axios.delete(`/categories/${row.id}`, {
       withCredentials: true
     })
     ElMessage.success('删除成功')
@@ -166,12 +166,12 @@ const handleSubmit = async () => {
     submitting.value = true
     
     if (isEdit.value) {
-      await axios.put(`http://localhost:3000/api/categories/${form.value.id}`, form.value, {
+      await axios.put(`/categories/${form.value.id}`, form.value, {
         withCredentials: true
       })
       ElMessage.success('更新成功')
     } else {
-      await axios.post('http://localhost:3000/api/categories', form.value, {
+      await axios.post('/categories', form.value, {
         withCredentials: true
       })
       ElMessage.success('添加成功')

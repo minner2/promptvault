@@ -81,8 +81,8 @@ const recentPrompts = ref([])
 const fetchData = async () => {
   try {
     const [promptsRes, categoriesRes] = await Promise.all([
-      axios.get('http://localhost:3000/api/prompts', { withCredentials: true }),
-      axios.get('http://localhost:3000/api/categories', { withCredentials: true })
+      axios.get('/prompts', { withCredentials: true }),
+      axios.get('/categories', { withCredentials: true })
     ])
 
     stats.value = {
