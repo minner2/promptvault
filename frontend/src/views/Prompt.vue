@@ -47,25 +47,35 @@
                 </span>
               </div>
             </div>
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-4">
               <button
-                class="inline-flex items-center px-4 py-2 text-sm transition-all duration-300 rounded-lg"
+                class="inline-flex items-center px-5 py-2.5 text-sm transition-all duration-300 rounded-lg"
+                :class="isDark
+                  ? 'bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-white'
+                  : 'bg-gray-100/50 hover:bg-gray-100 text-gray-600 hover:text-gray-900'"
+                @click="copyContent"
+              >
+                <el-icon class="mr-2 text-lg"><DocumentCopy /></el-icon>
+                复制内容
+              </button>
+              <button
+                class="inline-flex items-center px-5 py-2.5 text-sm transition-all duration-300 rounded-lg"
                 :class="isDark
                   ? 'bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-white'
                   : 'bg-gray-100/50 hover:bg-gray-100 text-gray-600 hover:text-gray-900'"
                 @click="showUsage"
               >
-                <el-icon class="mr-2"><Document /></el-icon>
+                <el-icon class="mr-2 text-lg"><Document /></el-icon>
                 用途说明
               </button>
               <button
-                class="inline-flex items-center px-4 py-2 text-sm transition-all duration-300 rounded-lg"
+                class="inline-flex items-center px-5 py-2.5 text-sm transition-all duration-300 rounded-lg"
                 :class="isDark
                   ? 'bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-white'
                   : 'bg-gray-100/50 hover:bg-gray-100 text-gray-600 hover:text-gray-900'"
                 @click="sharePrompt"
               >
-                <el-icon class="mr-2"><Share /></el-icon>
+                <el-icon class="mr-2 text-lg"><Share /></el-icon>
                 分享
               </button>
             </div>
@@ -107,7 +117,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Document, Share, ArrowLeft } from '@element-plus/icons-vue'
+import { Document, Share, ArrowLeft, DocumentCopy } from '@element-plus/icons-vue'
 import { useThemeStore } from '../stores/theme'
 import axios from 'axios'
 
@@ -146,6 +156,25 @@ const sharePrompt = async () => {
     await navigator.clipboard.writeText(shareUrl)
     ElMessage({
       message: '分享链接已复制到剪贴板',
+      type: 'success'
+    })
+  } catch (error) {
+    ElMessage({
+      message: '复制失败',
+      type: 'error'
+    })
+    console.error('复制失败:', error)
+  }
+}
+
+// 复制prompt内容
+const copyContent = async () => {
+  if (!prompt.value?.content) return
+  
+  try {
+    await navigator.clipboard.writeText(prompt.value.content)
+    ElMessage({
+      message: '内容已复制到剪贴板',
       type: 'success'
     })
   } catch (error) {
